@@ -1,3 +1,5 @@
+#Username: pradeep
+#Password: hello
 from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 import uuid
@@ -22,7 +24,7 @@ db = SQLAlchemy(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     public_id = db.Column(db.String(50), unique = True)
-    name = db.Column(db.String(50))
+    name = db.Column(db.String(50), unique = True)
     password = db.Column(db.String(80))
     admin = db.Column(db.Boolean)
 
@@ -34,8 +36,6 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
-       
-
         if 'x-access-token' in request.headers:
             token = request.headers['x-access-token']
             
@@ -138,6 +138,8 @@ def login():
         
         return jsonify({'token':token})
     return make_response('Could not verify',401,{'WWW-Authenticate':'Basic realm = "Login required!'})
+
+##logs out from the system by blacklisting the token
 @app.route('/logout')
 @token_required
 def logout(current_user, token):
